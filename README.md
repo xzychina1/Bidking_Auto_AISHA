@@ -1,9 +1,14 @@
 # BidKing Fresh Bot
 
 `BidKing Fresh Bot` 是一个面向 Windows 桌面端《竞拍之王 / BidKing》的 OCR 识别与自动化工具。
+感谢以下开源项目
+bidking_shadow
+https://github.com/zxTinF/bidking_shadow
 
+bidking-bot
+https://github.com/sarkozyfan/bidking-bot
 这个项目的目标很直接：
-
+通过集成上面两个项目实现
 - 识别游戏中央信息区
 - 将 OCR 文本解析成结构化拍卖信息
 - 根据可配置的价格模型计算建议出价
@@ -131,17 +136,6 @@ git push -u origin main
 4. 启动 GUI。
 5. 设置单格价格、地图、轮次和激进度。
 6. 点击开始运行。
-
-## 适合开源发布的说明
-
-如果你准备把它当成公开项目发布，建议至少补齐下面几项：
-
-- 把 `config.json` 里的窗口标题、坐标、地图点位先校准到你的本机环境。
-- 说明 `bidking_shadow` 是可选增强依赖。如果本机有这个项目并且路径配置正确，GUI 会优先使用 shadow 估值；如果没有，程序会自动回退到内置的旧出价逻辑，依然可以正常运行。
-- 在仓库说明里写明这是 Windows 桌面自动化工具，只支持本地桌面环境。
-- 不要直接提交任何与你机器强绑定的隐私路径、账号信息或调试日志。
-
-如果你愿意开源，README 里最好再补一段“首次运行前必须校准坐标”的提示，这样别人拉下来不会直接误用默认坐标。
 
 
 ## 注意事项
