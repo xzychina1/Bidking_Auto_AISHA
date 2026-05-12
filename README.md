@@ -80,36 +80,6 @@ python .\bidking_gui.py
 powershell -ExecutionPolicy Bypass -File .\bidking_fresh_bot\start.ps1
 ```
 
-## 打包 EXE
-
-仓库中已经附带 PyInstaller 打包脚本：
-
-```powershell
-cd .\bidking_fresh_bot
-powershell -ExecutionPolicy Bypass -File .\build_exe.ps1
-```
-
-打包成功后，默认输出位置为：
-
-```text
-bidking_fresh_bot\dist\BidKingFreshBot_release.exe
-```
-
-如果你想自己创建一个新的 GitHub 仓库并上传这套项目，推荐流程是：
-
-1. 在 GitHub 新建一个空仓库。
-2. 在本地把当前目录的远端地址改成你自己的仓库地址。
-3. 执行 `git add .`、`git commit`、`git push`。
-4. 如果要发布可执行文件，先运行下面的 EXE 打包脚本，再把生成的 release 文件上传到仓库的 Release 或 Assets。
-
-示例命令：
-
-```powershell
-git remote set-url origin https://github.com/<your-name>/<your-repo>.git
-git add .
-git commit -m "initial release"
-git push -u origin main
-```
 
 ## 配置说明
 
