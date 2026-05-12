@@ -52,7 +52,6 @@
   "ocr": {
     "provider": "rapidocr",
     "endpoint": "",
-    "method": "POST",
     "timeout_seconds": 20,
     "headers": {},
     "image_field": "image_base64",
@@ -73,12 +72,20 @@
     "computed_price_unit": "w",
     "computed_price_multiplier": 10000,
     "rounding": "floor_int",
-    "fallback_bid_price": 30000,
+    "fallback_bid_price": 120000,
     "last_submitted_price": null,
-    "min_useful_facts": 1
+    "min_useful_facts": 1,
+    "shadow_bridge": {
+      "enabled": true,
+      "source": "getlog",
+      "project_path": "C:\\Users\\10790\\bidking_shadow",
+      "empty_cell_value": 10000.0,
+      "min_confidence": 0.0
+    },
+    "sticky_increment_step": null
   },
   "automation": {
-    "selected_mode": "express",
+    "selected_mode": "normal",
     "tool_rounds": [],
     "default_map": "1",
     "default_runs": 1,
@@ -89,66 +96,65 @@
         "name": "快递盲盒堆",
         "point": {
           "origin": "left_bottom",
-          "x": 464,
-          "y": 710
+          "x": 689,
+          "y": 680
         }
       },
       "2": {
         "name": "废弃仓库",
         "point": {
           "origin": "left_bottom",
-          "x": 922,
-          "y": 764
+          "x": 1185,
+          "y": 765
         }
       },
       "3": {
         "name": "深海沉船",
         "point": {
           "origin": "left_bottom",
-          "x": 1597,
-          "y": 620
+          "x": 1617,
+          "y": 603
         }
       },
       "4": {
         "name": "沉船密封舱",
         "point": {
           "origin": "left_bottom",
-          "x": 1634,
-          "y": 413
+          "x": 1839,
+          "y": 398
         }
       },
       "5": {
         "name": "航运集装箱",
         "point": {
           "origin": "left_bottom",
-          "x": 557,
-          "y": 400
+          "x": 641,
+          "y": 325
         }
       },
       "6": {
         "name": "空置别墅",
         "point": {
           "origin": "left_bottom",
-          "x": 1202,
-          "y": 440
+          "x": 1564,
+          "y": 346
         }
       },
       "7": {
         "name": "幽静别墅",
         "point": {
           "origin": "left_bottom",
-          "x": 1489,
-          "y": 240
+          "x": 1740,
+          "y": 207
         }
       }
     },
-    "selected_map": "1",
-    "selected_runs": 5,
+    "selected_map": "7",
+    "selected_runs": 1,
     "selected_risk": "avg_price",
     "custom_risk_factor": 0.0,
     "safe_guard_enabled": false,
     "safe_guard_max_increase_ratio": 0.5,
-    "bid_cap_price": 0,
     "sticky_increment_ratio": 0.03,
     "express_total_multiplier": 1009.0
   },

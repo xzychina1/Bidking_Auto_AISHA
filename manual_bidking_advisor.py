@@ -80,13 +80,17 @@ FIELD_LABELS = {
     "avg_gold": "橙色平均格子",
     "avg_red": "红色平均格子",
 }
-ROLE_LABELS = {"ahmad": "艾哈迈德", "lavin": "拉文", "victor": "维克托", "none": "未知/通用"}
+ROLE_LABELS = {"ahmad": "爱莎", "lavin": "拉文", "victor": "维克托", "none": "未知/通用"}
 ROLE_ALIASES = {
     "ahmed": "ahmad",
     "role2": "ahmad",
     "raven": "lavin",
     "role3": "lavin",
     "weiketu": "victor",
+    "aisa": "ahmad",
+    "aisha": "ahmad",
+    "艾莎": "ahmad",
+    "爱莎": "ahmad",
 }
 ROLE_AUTO_FIELDS = {
     "ahmad": {1: ["total_all"], 2: ["avg_gold"], 3: ["avg_purple"], 4: ["avg_blue"], 5: ["wg_total"]},

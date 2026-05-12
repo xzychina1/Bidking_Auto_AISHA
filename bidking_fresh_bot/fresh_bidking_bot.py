@@ -34,6 +34,7 @@ if str(WORKSPACE) not in sys.path:
 from bidking_maa_test.central_info_parser import merge_patch, parse_central_info  # noqa: E402
 from bidking_maa_test.window_backend import capture_window_frame, find_window, scale_point  # noqa: E402
 from manual_bidking_advisor import evaluate  # noqa: E402
+from bidking_shadow_bridge import build_shadow_snapshot as build_real_shadow_snapshot  # noqa: E402
 
 try:
     import ctypes
@@ -46,6 +47,14 @@ except Exception:  # pragma: no cover - only used on Windows desktops.
 
 _FAST_OCR = None
 _STOP_EVENT = threading.Event()
+LAST_SHADOW_STATUS: dict[str, Any] = {
+    "available": False,
+    "expected_value": 0.0,
+    "empty_cell_count": 0,
+    "confidence": 0.0,
+    "source": "getlog",
+    "reason": "not initialized",
+}
 
 HWND_TOP = 0
 HWND_TOPMOST = -1
@@ -219,6 +228,76 @@ def apply_price_config(data: dict[str, Any], price_config: dict[str, Any]) -> di
     if "round_rules" in price_config:
         data["round_rules"] = dict(price_config["round_rules"])
     return data
+
+
+def get_shadow_snapshot(
+    config: dict[str, Any],
+    parsed_patch: dict[str, Any],
+    round_no: int,
+    price_config: dict[str, Any],
+) -> dict[str, Any]:
+    bridge = config.get("pricing", {}).get("shadow_bridge", {})
+    if not bool(bridge.get("enabled", True)):
+        snapshot = {
+            "available": False,
+            "expected_value": 0.0,
+            "empty_cell_count": 0,
+            "confidence": 0.0,
+            "source": str(bridge.get("source", "getlog")),
+            "reason": "shadow bridge disabled",
+        }
+        LAST_SHADOW_STATUS.update(snapshot)
+        return snapshot
+
+    source = str(bridge.get("source", "getlog")).strip().lower() or "getlog"
+    if source == "mock":
+        expected_value = _safe_non_negative_float(
+            bridge.get("mock_expected_value", 65000),
+            65000,
+        )
+        empty_cell_count = int(_safe_non_negative_float(bridge.get("mock_empty_cell_count", 6), 6))
+        confidence = _safe_non_negative_float(bridge.get("mock_confidence", 0.9), 0.9)
+        snapshot = {
+            "available": True,
+            "expected_value": float(expected_value),
+            "empty_cell_count": max(0, int(empty_cell_count)),
+            "confidence": float(confidence),
+            "source": "mock",
+            "reason": f"mock snapshot round={int(round_no)}",
+        }
+        LAST_SHADOW_STATUS.update(snapshot)
+        return snapshot
+
+    if source == "getlog":
+        try:
+            snapshot = build_real_shadow_snapshot(
+                config=config,
+                parsed_patch=parsed_patch,
+                round_no=round_no,
+                price_config=price_config,
+            )
+        except Exception as exc:
+            snapshot = {
+                "available": False,
+                "expected_value": 0.0,
+                "empty_cell_count": 0,
+                "confidence": 0.0,
+                "source": "getlog",
+                "reason": f"shadow bridge error: {type(exc).__name__}: {exc}",
+            }
+        LAST_SHADOW_STATUS.update(snapshot)
+        return snapshot
+
+    snapshot = {
+        "available": False,
+        "expected_value": 0.0,
+        "empty_cell_count": 0,
+        "confidence": 0.0,
+        "source": source,
+        "reason": f"unsupported shadow source: {source}",
+    }
+    LAST_SHADOW_STATUS.update(snapshot)
+    return snapshot
 
 
 def build_advisor_input(config: dict[str, Any], text: str, round_no: int, price_config: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -868,19 +947,8 @@ def choose_express_bid_value(config: dict[str, Any], parsed_patch: dict[str, Any
 
 
 def apply_bid_cap(config: dict[str, Any], final_price: int, payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
-    automation = config.get("automation", {})
-    bid_cap = max(0, parse_int_config(automation.get("bid_cap_price"), 0))
-    if bid_cap <= 0:
-        payload["bid_cap"] = {"enabled": False, "cap_price": 0, "applied": False}
-        return int(final_price), payload
-    capped = min(int(final_price), bid_cap)
-    payload["bid_cap"] = {
-        "enabled": True,
-        "cap_price": bid_cap,
-        "applied": capped != int(final_price),
-        "original_price": int(final_price),
-    }
-    return int(capped), payload
+    payload["bid_cap"] = {"enabled": False, "cap_price": 0, "applied": False}
+    return int(final_price), payload
 
 
 def apply_safe_guard(config: dict[str, Any], final_price: int, payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
@@ -969,6 +1037,36 @@ def compute_bid_price(
         "result": {},
         "source_value": None,
     }
+
+    shadow_bridge = config.get("pricing", {}).get("shadow_bridge", {})
+    shadow = get_shadow_snapshot(config, parsed_patch, round_no, price_config)
+    if (
+        str(shadow_bridge.get("source", "getlog")).strip().lower() == "getlog"
+        and shadow.get("available")
+        and mode != "express"
+    ):
+        shadow_expected_value = float(shadow.get("expected_value", 0.0) or 0.0)
+        shadow_empty_cell_count = int(shadow.get("empty_cell_count", 0) or 0)
+        shadow_empty_cell_value = parse_float_config(shadow_bridge.get("empty_cell_value"), 10000.0)
+        raw_value = shadow_expected_value
+        if int(round_no) >= 4:
+            raw_value += shadow_empty_cell_count * float(shadow_empty_cell_value)
+        if int(round_no) >= 5:
+            raw_value *= 1.13
+        price = choose_rounding(raw_value, rounding)
+        payload["shadow"] = shadow
+        payload["source_value"] = shadow_expected_value
+        payload["reason"] = (
+            f"{shadow.get('reason', 'getlog shadow')}; "
+            f"empty_cell_value={float(shadow_empty_cell_value):.2f}; "
+            f"empty_cells={'on' if int(round_no) >= 4 else 'off'}; shadow_raw={raw_value:.2f} -> input={price}"
+        )
+        final_price, sticky_reason = apply_sticky_increment(config, price)
+        final_price, payload = apply_safe_guard(config, final_price, payload)
+        if sticky_reason:
+            payload["reason"] += f"; {sticky_reason}"
+        return int(final_price), payload
+
     if len(facts) < min_facts:
         payload["fallback"] = True
         payload["reason"] = f"not enough parsed facts: {len(facts)}"
@@ -1024,9 +1122,6 @@ def compute_bid_price(
             payload["reason"] = f"{source_reason}: {value:.4f}w * {multiplier} -> input={final_price}"
     if sticky_reason:
         payload["reason"] += f"; {sticky_reason}"
-    bid_cap_info = payload.get("bid_cap") or {}
-    if bid_cap_info.get("applied"):
-        payload["reason"] += f"; bid_cap={bid_cap_info.get('cap_price')}"
     return int(final_price), payload
 
 

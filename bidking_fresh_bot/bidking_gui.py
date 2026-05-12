@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent
 CONFIG_PATH = ROOT / "config.json"
 PRICE_CONFIG_PATH = ROOT / "price_config.json"
 
-MAP_KEYS = ("1", "2", "3", "4", "5", "6", "7")
+MAP_KEYS = ("7",)
 RISK_OPTIONS = {
     "保守": "floor_price",
     "均衡": "avg_price",
@@ -30,9 +30,7 @@ MODE_OPTIONS = {
 }
 MODE_LABEL_BY_VALUE = {value: label for label, value in MODE_OPTIONS.items()}
 ROLE_OPTIONS = {
-    "艾哈迈德": "ahmad",
-    "拉文": "lavin",
-    "维克托": "victor",
+    "爱莎": "ahmad",
 }
 ROLE_LABEL_BY_VALUE = {value: label for label, value in ROLE_OPTIONS.items()}
 
@@ -71,7 +69,10 @@ class BidKingApp:
         self.express_multiplier_var = tk.StringVar()
         self.safe_guard_enabled_var = tk.BooleanVar()
         self.safe_guard_ratio_var = tk.StringVar()
-        self.bid_cap_price_var = tk.StringVar()
+        self.shadow_enabled_var = tk.BooleanVar()
+        self.shadow_source_var = tk.StringVar()
+        self.shadow_empty_cell_value_var = tk.StringVar()
+        self.shadow_min_confidence_var = tk.StringVar()
         self.sticky_increment_var = tk.StringVar()
         self.calc_vars: dict[str, tk.StringVar] = {}
         self.weight_summary_var = tk.StringVar()
@@ -152,7 +153,7 @@ class BidKingApp:
         ttk.Entry(risk_box, textvariable=self.custom_risk_var, width=10).pack(side="left", padx=(8, 12))
         ttk.Label(risk_box, text="例如 -0.2=平均价80%，0.8=平均价180%").pack(side="left")
 
-        extra_box = ttk.LabelFrame(main, text="4. 模式与安全", padding=10)
+        extra_box = ttk.LabelFrame(main, text="4. 爱莎逻辑与安全", padding=10)
         extra_box.pack(fill="x", pady=(10, 0))
         row1 = ttk.Frame(extra_box)
         row1.pack(fill="x")
@@ -163,27 +164,33 @@ class BidKingApp:
         row2 = ttk.Frame(extra_box)
         row2.pack(fill="x", pady=(8, 0))
         ttk.Checkbutton(row2, text="安全开关", variable=self.safe_guard_enabled_var).pack(side="left")
-        ttk.Label(row2, text="单回合最大加价比例").pack(side="left", padx=(12, 0))
+        ttk.Label(row2, text="单回合最大上浮比例").pack(side="left", padx=(12, 0))
         ttk.Entry(row2, textvariable=self.safe_guard_ratio_var, width=10).pack(side="left", padx=(8, 12))
         ttk.Label(row2, text="例如 0.5 代表超过上回合 50% 就自动取消").pack(side="left")
 
         row3 = ttk.Frame(extra_box)
         row3.pack(fill="x", pady=(8, 0))
-        ttk.Label(row3, text="出价硬顶").pack(side="left")
-        ttk.Entry(row3, textvariable=self.bid_cap_price_var, width=10).pack(side="left", padx=(8, 12))
-        ttk.Label(row3, text="达到硬顶后停止继续加价，0 代表无硬顶").pack(side="left")
+        ttk.Label(row3, text="防黏递增比例").pack(side="left")
+        ttk.Entry(row3, textvariable=self.sticky_increment_var, width=10).pack(side="left", padx=(8, 12))
+        ttk.Label(row3, text="按首个出价生成固定步长，后续每回合线性递增且不自动降价").pack(side="left")
 
         row4 = ttk.Frame(extra_box)
         row4.pack(fill="x", pady=(8, 0))
-        ttk.Label(row4, text="防黏递增比例").pack(side="left")
-        ttk.Entry(row4, textvariable=self.sticky_increment_var, width=10).pack(side="left", padx=(8, 12))
-        ttk.Label(row4, text="按首个出价生成固定步长，后续每回合线性递增且不自动降价").pack(side="left")
+        ttk.Checkbutton(row4, text="启用 shadow 估值", variable=self.shadow_enabled_var).pack(side="left")
+        ttk.Label(row4, text="来源").pack(side="left", padx=(12, 0))
+        self.shadow_source_combo = ttk.Combobox(row4, textvariable=self.shadow_source_var, state="readonly", width=12)
+        self.shadow_source_combo["values"] = ("getlog", "mock")
+        self.shadow_source_combo.pack(side="left", padx=(8, 12))
+        ttk.Label(row4, text="空置格权重").pack(side="left")
+        ttk.Entry(row4, textvariable=self.shadow_empty_cell_value_var, width=10).pack(side="left", padx=(8, 12))
+        ttk.Label(row4, text="最低置信度").pack(side="left")
+        ttk.Entry(row4, textvariable=self.shadow_min_confidence_var, width=10).pack(side="left", padx=(8, 12))
 
         row5 = ttk.Frame(extra_box)
         row5.pack(fill="x", pady=(8, 0))
-        ttk.Label(row5, text="Fallback 出价").pack(side="left")
+        ttk.Label(row5, text="极端兜底价").pack(side="left")
         ttk.Entry(row5, textvariable=self.fallback_price_var, width=10).pack(side="left", padx=(8, 12))
-        ttk.Label(row5, text="识别失败或被安全开关拦截时使用").pack(side="left")
+        ttk.Label(row5, text="仅在 shadow 与 OCR 都不可用时使用，不参与正常出价路径").pack(side="left")
 
         tip_box = ttk.LabelFrame(main, text="7. 道具提示", padding=10)
         tip_box.pack(fill="x", pady=(10, 0))
@@ -262,7 +269,7 @@ class BidKingApp:
         self.calc_result_text.pack(fill="both", expand=True)
 
     def load_into_form(self) -> None:
-        default_map = str(self.config.get("automation", {}).get("default_map", "4"))
+        default_map = str(self.config.get("automation", {}).get("default_map", "7"))
         self.map_var.set(f"{default_map}. {self.config['automation']['maps'][default_map]['name']}")
         self.runs_var.set(str(self.config.get("automation", {}).get("default_runs", 1)))
         selected_mode = self.config.get("automation", {}).get("selected_mode", "normal")
@@ -270,7 +277,7 @@ class BidKingApp:
         self.mode_var.set(mode_label)
         self.risk_var.set("均衡")
         role = self.config.get("advisor", {}).get("role", "ahmad")
-        self.role_var.set(ROLE_LABEL_BY_VALUE.get(role, "艾哈迈德"))
+        self.role_var.set(ROLE_LABEL_BY_VALUE.get(role, "爱莎"))
         selected_risk = self.config.get("automation", {}).get("selected_risk", "avg_price")
         self.risk_var.set(RISK_LABEL_BY_VALUE.get(selected_risk, "均衡"))
         self.custom_risk_var.set(str(self.config.get("automation", {}).get("custom_risk_factor", 0.0)))
@@ -278,7 +285,11 @@ class BidKingApp:
         self.express_multiplier_var.set(str(self.config.get("automation", {}).get("express_total_multiplier", 1000)))
         self.safe_guard_enabled_var.set(bool(self.config.get("automation", {}).get("safe_guard_enabled", False)))
         self.safe_guard_ratio_var.set(str(self.config.get("automation", {}).get("safe_guard_max_increase_ratio", 0.5)))
-        self.bid_cap_price_var.set(str(self.config.get("automation", {}).get("bid_cap_price", 0)))
+        shadow_bridge = self.config.get("pricing", {}).get("shadow_bridge", {})
+        self.shadow_enabled_var.set(bool(shadow_bridge.get("enabled", True)))
+        self.shadow_source_var.set(str(shadow_bridge.get("source", "getlog")))
+        self.shadow_empty_cell_value_var.set(str(shadow_bridge.get("empty_cell_value", 10000)))
+        self.shadow_min_confidence_var.set(str(shadow_bridge.get("min_confidence", 0.0)))
         self.sticky_increment_var.set(str(self.config.get("automation", {}).get("sticky_increment_ratio", 0.03)))
         tool_rounds = {int(item) for item in self.config.get("automation", {}).get("tool_rounds", [1, 2])}
         for round_no, var in self.tool_round_vars.items():
@@ -299,9 +310,9 @@ class BidKingApp:
     def apply_form_to_config(self) -> None:
         runs_value = int(self.runs_var.get()) if self.runs_var.get().isdigit() and int(self.runs_var.get()) > 0 else 1
         selected_mode = MODE_OPTIONS.get(self.mode_var.get().strip(), "normal")
-        selected_map = self.selected_map_key() or "4"
+        selected_map = self.selected_map_key() or "7"
         if selected_mode == "express":
-            selected_map = "1"
+            selected_map = "7"
         selected_risk = RISK_OPTIONS.get(self.risk_var.get().strip(), "avg_price")
         selected_role = ROLE_OPTIONS.get(self.role_var.get().strip(), "ahmad")
         selected_tool_rounds = [round_no for round_no, var in self.tool_round_vars.items() if var.get()]
@@ -311,7 +322,6 @@ class BidKingApp:
         fallback_bid_price = int(float(self.fallback_price_var.get().strip() or "30000"))
         express_total_multiplier = float(self.express_multiplier_var.get().strip() or "1000")
         safe_guard_ratio = float(self.safe_guard_ratio_var.get().strip() or "0")
-        bid_cap_price = int(float(self.bid_cap_price_var.get().strip() or "0"))
         sticky_increment_ratio = float(self.sticky_increment_var.get().strip() or "0")
 
         self.config.setdefault("automation", {})
@@ -324,10 +334,15 @@ class BidKingApp:
         self.config["automation"]["express_total_multiplier"] = express_total_multiplier
         self.config["automation"]["safe_guard_enabled"] = bool(self.safe_guard_enabled_var.get())
         self.config["automation"]["safe_guard_max_increase_ratio"] = safe_guard_ratio
-        self.config["automation"]["bid_cap_price"] = bid_cap_price
         self.config["automation"]["sticky_increment_ratio"] = sticky_increment_ratio
         self.config["automation"]["tool_rounds"] = selected_tool_rounds
+        self.config["automation"].pop("bid_cap_price", None)
         self.config["pricing"]["fallback_bid_price"] = fallback_bid_price
+        self.config["pricing"].setdefault("shadow_bridge", {})
+        self.config["pricing"]["shadow_bridge"]["enabled"] = bool(self.shadow_enabled_var.get())
+        self.config["pricing"]["shadow_bridge"]["source"] = self.shadow_source_var.get().strip() or "getlog"
+        self.config["pricing"]["shadow_bridge"]["empty_cell_value"] = float(self.shadow_empty_cell_value_var.get().strip() or "10000")
+        self.config["pricing"]["shadow_bridge"]["min_confidence"] = float(self.shadow_min_confidence_var.get().strip() or "0")
         self.config.setdefault("advisor", {})["role"] = selected_role
 
         self.save_json(CONFIG_PATH, self.config)
@@ -446,11 +461,11 @@ class BidKingApp:
     def clear_manual_calculator(self) -> None:
         for key, var in self.calc_vars.items():
             var.set("1" if key == "round" else "")
-        self.calc_vars["role"].set(self.role_var.get() or "艾哈迈德")
+        self.calc_vars["role"].set(self.role_var.get() or "爱莎")
 
     def sync_calculator_from_config(self) -> None:
         advisor = self.config.get("advisor", {})
-        self.calc_vars["role"].set(self.role_var.get() or ROLE_LABEL_BY_VALUE.get(advisor.get("role", "ahmad"), "艾哈迈德"))
+        self.calc_vars["role"].set(self.role_var.get() or ROLE_LABEL_BY_VALUE.get(advisor.get("role", "ahmad"), "爱莎"))
         self.calc_vars["round"].set(str(advisor.get("round", 1)))
         green_count = advisor.get("green_count")
         white_count = advisor.get("white_count")
