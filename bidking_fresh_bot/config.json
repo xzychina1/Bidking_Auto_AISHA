@@ -78,7 +78,7 @@
     "shadow_bridge": {
       "enabled": true,
       "source": "getlog",
-      "project_path": "C:\\Users\\10790\\bidking_shadow",
+      "project_path": "",
       "empty_cell_value": 10000.0,
       "min_confidence": 0.0
     },

@@ -47,6 +47,10 @@ https://github.com/sarkozyfan/bidking-bot
   - 基于 ROI 的截图分析工具
 - `bidking_maa_test/roi_config.json`
   - ROI 区域配置
+- `bidking_shadow/getlog/`
+  - 内置的 shadow 估值与日志解析模块
+- `bidking_shadow/item_prices.csv`
+  - shadow 估值用的物品价格表
 
 ## 运行环境
 
@@ -107,6 +111,16 @@ powershell -ExecutionPolicy Bypass -File .\bidking_fresh_bot\start.ps1
 5. 设置单格价格、地图、轮次和激进度。
 6. 点击开始运行。
 
+## 适合开源发布的说明
+
+如果你准备把它当成公开项目发布，建议至少补齐下面几项：
+
+- 把 `config.json` 里的窗口标题、坐标、地图点位先校准到你的本机环境。
+- `bidking_shadow` 的估值能力已经随仓库一并内置进来了，不需要再额外准备外部目录；如果你手动改了路径配置，也可以指向别的位置。
+- 在仓库说明里写明这是 Windows 桌面自动化工具，只支持本地桌面环境。
+- 不要直接提交任何与你机器强绑定的隐私路径、账号信息或调试日志。
+
+如果你愿意开源，README 里最好再补一段“首次运行前必须校准坐标”的提示，这样别人拉下来不会直接误用默认坐标。
 
 ## 注意事项
 

@@ -8,16 +8,8 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_SHADOW_PROJECT_ROOT = Path(r"C:\Users\10790\bidking_shadow")
-
-
-def _as_path(value: Any, default: Path) -> Path:
-    if value in (None, ""):
-        return default
-    try:
-        return Path(str(value))
-    except Exception:
-        return default
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_SHADOW_PROJECT_ROOT = REPO_ROOT / "bidking_shadow"
 
 
 def _shadow_project_root(config: dict[str, Any]) -> Path:
@@ -27,7 +19,7 @@ def _shadow_project_root(config: dict[str, Any]) -> Path:
         return DEFAULT_SHADOW_PROJECT_ROOT
     path = Path(str(raw_path))
     if not path.is_absolute():
-        return DEFAULT_SHADOW_PROJECT_ROOT / path
+        return (REPO_ROOT / path).resolve()
     return path
 
 
@@ -43,7 +35,7 @@ def _shadow_log_path(config: dict[str, Any], project_root: Path) -> Path:
     try:
         _ensure_shadow_import_path(project_root)
         with _shadow_working_directory(project_root):
-            from getlog.constants import DEFAULT_GAME_LOG
+            from bidking_shadow.getlog.constants import DEFAULT_GAME_LOG
 
         return Path(DEFAULT_GAME_LOG)
     except Exception:
@@ -62,7 +54,7 @@ def _shadow_csv_path(config: dict[str, Any], project_root: Path) -> Path:
     try:
         _ensure_shadow_import_path(project_root)
         with _shadow_working_directory(project_root):
-            from getlog.constants import CSV_PATH
+            from bidking_shadow.getlog.constants import CSV_PATH
 
         return Path(CSV_PATH)
     except Exception:
@@ -70,7 +62,7 @@ def _shadow_csv_path(config: dict[str, Any], project_root: Path) -> Path:
 
 
 def _ensure_shadow_import_path(project_root: Path) -> None:
-    root = str(project_root)
+    root = str(project_root.parent)
     if root not in sys.path:
         sys.path.insert(0, root)
 
@@ -90,15 +82,15 @@ def _shadow_runtime(project_root: str):
     root = Path(project_root)
     _ensure_shadow_import_path(root)
     with _shadow_working_directory(root):
-        from getlog.constants import DEFAULT_GAME_LOG, CSV_PATH
-        from getlog.item_db import _filter_candidates, candidate_probabilities, load_csv
-        from getlog.posterior_estimator import (
+        from bidking_shadow.getlog.constants import DEFAULT_GAME_LOG, CSV_PATH
+        from bidking_shadow.getlog.item_db import _filter_candidates, candidate_probabilities, load_csv
+        from bidking_shadow.getlog.posterior_estimator import (
             WeightedValue,
             estimate_total_posterior,
             price_likelihood,
         )
-        from getlog.runner import parse_last_game_state_from_tail
-        from getlog.grid_view_shared import GRID_COLS, GRID_ROWS, MIN_ROUND_SHOW_EMPTY
+        from bidking_shadow.getlog.runner import parse_last_game_state_from_tail
+        from bidking_shadow.getlog.grid_view_shared import GRID_COLS, GRID_ROWS, MIN_ROUND_SHOW_EMPTY
 
     return {
         "DEFAULT_GAME_LOG": DEFAULT_GAME_LOG,

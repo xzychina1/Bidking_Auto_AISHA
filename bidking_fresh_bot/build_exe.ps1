@@ -26,6 +26,11 @@ python -m PyInstaller `
   --add-data "config.json;." `
   --add-data "price_config.json;." `
   --add-data "..\manual_bidking_advisor.py;." `
+  --add-data "..\bidking_shadow\__init__.py;bidking_shadow" `
+  --add-data "..\bidking_shadow\item_prices.csv;bidking_shadow" `
+  --add-data "..\bidking_shadow\calculator_data_merged.csv;bidking_shadow" `
+  --add-data "..\bidking_shadow\drop_table_weights.csv;bidking_shadow" `
+  --add-data "..\bidking_shadow\map_prior.html;bidking_shadow" `
   --add-data "..\bidking_maa_test\__init__.py;bidking_maa_test" `
   --add-data "..\bidking_maa_test\central_info_parser.py;bidking_maa_test" `
   --add-data "..\bidking_maa_test\window_backend.py;bidking_maa_test" `
