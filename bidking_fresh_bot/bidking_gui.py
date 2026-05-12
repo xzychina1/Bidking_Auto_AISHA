@@ -16,7 +16,6 @@ ROOT = Path(__file__).resolve().parent
 CONFIG_PATH = ROOT / "config.json"
 PRICE_CONFIG_PATH = ROOT / "price_config.json"
 
-MAP_KEYS = ("7",)
 RISK_OPTIONS = {
     "保守": "floor_price",
     "均衡": "avg_price",
@@ -111,7 +110,7 @@ class BidKingApp:
 
         ttk.Label(settings_box, text="地图").grid(row=0, column=0, sticky="w", pady=4)
         self.map_combo = ttk.Combobox(settings_box, textvariable=self.map_var, state="readonly", width=20)
-        self.map_combo["values"] = [f"{k}. {self.config['automation']['maps'][k]['name']}" for k in MAP_KEYS]
+        self.map_combo["values"] = self.map_display_values()
         self.map_combo.grid(row=0, column=1, sticky="w", pady=4)
 
         ttk.Label(settings_box, text="重复次数").grid(row=1, column=0, sticky="w", pady=4)
@@ -270,7 +269,7 @@ class BidKingApp:
 
     def load_into_form(self) -> None:
         default_map = str(self.config.get("automation", {}).get("default_map", "7"))
-        self.map_var.set(f"{default_map}. {self.config['automation']['maps'][default_map]['name']}")
+        self.map_var.set(self.map_display_label(default_map))
         self.runs_var.set(str(self.config.get("automation", {}).get("default_runs", 1)))
         selected_mode = self.config.get("automation", {}).get("selected_mode", "normal")
         mode_label = MODE_LABEL_BY_VALUE.get(selected_mode, "标准模式")
@@ -306,6 +305,17 @@ class BidKingApp:
     def selected_map_key(self) -> str:
         text = self.map_var.get().strip()
         return text.split(".", 1)[0].strip() if "." in text else text
+
+    def map_display_label(self, key: str) -> str:
+        maps = self.config.get("automation", {}).get("maps", {})
+        name = maps.get(str(key), {}).get("name", "")
+        if name:
+            return f"{key}. {name}"
+        return str(key)
+
+    def map_display_values(self) -> list[str]:
+        maps = self.config.get("automation", {}).get("maps", {})
+        return [f"{key}. {item['name']}" for key, item in maps.items()]
 
     def apply_form_to_config(self) -> None:
         runs_value = int(self.runs_var.get()) if self.runs_var.get().isdigit() and int(self.runs_var.get()) > 0 else 1
@@ -359,7 +369,7 @@ class BidKingApp:
     def on_mode_changed(self) -> None:
         mode = MODE_OPTIONS.get(self.mode_var.get().strip(), "normal")
         if mode == "express":
-            self.map_var.set(f"1. {self.config['automation']['maps']['1']['name']}")
+            self.map_var.set(self.map_display_label("1"))
             self.map_combo.state(["disabled"])
             for var in self.tool_round_vars.values():
                 var.set(False)

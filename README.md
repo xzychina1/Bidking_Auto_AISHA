@@ -90,6 +90,22 @@ powershell -ExecutionPolicy Bypass -File .\build_exe.ps1
 bidking_fresh_bot\dist\BidKingFreshBot_release.exe
 ```
 
+如果你想自己创建一个新的 GitHub 仓库并上传这套项目，推荐流程是：
+
+1. 在 GitHub 新建一个空仓库。
+2. 在本地把当前目录的远端地址改成你自己的仓库地址。
+3. 执行 `git add .`、`git commit`、`git push`。
+4. 如果要发布可执行文件，先运行下面的 EXE 打包脚本，再把生成的 release 文件上传到仓库的 Release 或 Assets。
+
+示例命令：
+
+```powershell
+git remote set-url origin https://github.com/<your-name>/<your-repo>.git
+git add .
+git commit -m "initial release"
+git push -u origin main
+```
+
 ## 配置说明
 
 主要配置文件：
@@ -117,6 +133,15 @@ bidking_fresh_bot\dist\BidKingFreshBot_release.exe
 6. 点击开始运行。
 
 ## 适合开源发布的说明
+
+如果你准备把它当成公开项目发布，建议至少补齐下面几项：
+
+- 把 `config.json` 里的窗口标题、坐标、地图点位先校准到你的本机环境。
+- 说明 `bidking_shadow` 是可选增强依赖。如果本机有这个项目并且路径配置正确，GUI 会优先使用 shadow 估值；如果没有，程序会自动回退到内置的旧出价逻辑，依然可以正常运行。
+- 在仓库说明里写明这是 Windows 桌面自动化工具，只支持本地桌面环境。
+- 不要直接提交任何与你机器强绑定的隐私路径、账号信息或调试日志。
+
+如果你愿意开源，README 里最好再补一段“首次运行前必须校准坐标”的提示，这样别人拉下来不会直接误用默认坐标。
 
 
 ## 注意事项
