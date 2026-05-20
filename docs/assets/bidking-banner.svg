@@ -1,0 +1,29 @@
+<svg width="1200" height="320" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="0.55" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#1F2937"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="160" y1="40" x2="1080" y2="280" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#FDE68A"/>
+    </linearGradient>
+    <filter id="glow" x="0" y="0" width="1200" height="320" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="320" rx="32" fill="url(#bg)"/>
+  <circle cx="1065" cy="62" r="86" fill="#F59E0B" fill-opacity="0.10"/>
+  <circle cx="1038" cy="88" r="132" fill="#F59E0B" fill-opacity="0.06"/>
+  <path d="M86 230C206 186 298 182 400 210C504 239 602 244 710 208C828 168 941 160 1114 206" stroke="url(#accent)" stroke-width="6" stroke-linecap="round" opacity="0.65" filter="url(#glow)"/>
+  <path d="M108 154H148L174 98H210L186 154H240L216 210H258L232 266H192L218 210H168L142 266H104L128 210H84L108 154Z" fill="url(#accent)" opacity="0.95"/>
+  <text x="300" y="142" fill="#F9FAFB" font-family="Segoe UI, Arial, sans-serif" font-size="58" font-weight="700">BidKing Fresh Bot</text>
+  <text x="300" y="192" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="500">Windows OCR automation and bid assistant for BidKing</text>
+  <text x="300" y="232" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400">GUI-driven configuration • OCR parsing • price advisor • safe bidding cap</text>
+</svg>

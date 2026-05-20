@@ -346,7 +346,7 @@ class BidKingApp:
         self.config["automation"]["safe_guard_max_increase_ratio"] = safe_guard_ratio
         self.config["automation"]["sticky_increment_ratio"] = sticky_increment_ratio
         self.config["automation"]["tool_rounds"] = selected_tool_rounds
-        self.config["automation"].pop("bid_cap_price", None)
+        self.config["automation"]["bid_cap_price"] = 3000000
         self.config["pricing"]["fallback_bid_price"] = fallback_bid_price
         self.config["pricing"].setdefault("shadow_bridge", {})
         self.config["pricing"]["shadow_bridge"]["enabled"] = bool(self.shadow_enabled_var.get())

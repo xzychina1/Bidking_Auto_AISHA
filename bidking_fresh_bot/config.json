@@ -149,10 +149,11 @@
         }
       }
     },
-    "selected_map": "7",
+    "selected_map": "1",
     "selected_runs": 1,
     "selected_risk": "avg_price",
     "custom_risk_factor": 0.0,
+    "bid_cap_price": 3000000,
     "safe_guard_enabled": false,
     "safe_guard_max_increase_ratio": 0.5,
     "sticky_increment_ratio": 0.03,

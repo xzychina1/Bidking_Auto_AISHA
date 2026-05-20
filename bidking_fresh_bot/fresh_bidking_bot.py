@@ -947,8 +947,19 @@ def choose_express_bid_value(config: dict[str, Any], parsed_patch: dict[str, Any
 
 
 def apply_bid_cap(config: dict[str, Any], final_price: int, payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
-    payload["bid_cap"] = {"enabled": False, "cap_price": 0, "applied": False}
-    return int(final_price), payload
+    automation = config.get("automation", {})
+    bid_cap = max(0, parse_int_config(automation.get("bid_cap_price"), 3000000))
+    if bid_cap <= 0:
+        payload["bid_cap"] = {"enabled": False, "cap_price": 0, "applied": False}
+        return int(final_price), payload
+    capped = min(int(final_price), bid_cap)
+    payload["bid_cap"] = {
+        "enabled": True,
+        "cap_price": bid_cap,
+        "applied": capped != int(final_price),
+        "original_price": int(final_price),
+    }
+    return int(capped), payload
 
 
 def apply_safe_guard(config: dict[str, Any], final_price: int, payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
