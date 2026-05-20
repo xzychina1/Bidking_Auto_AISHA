@@ -47,6 +47,15 @@ Why this project exists:
 - Execute tool usage, bidding, confirmation, and round transitions automatically
 - Keep day-to-day configuration, debugging, and manual calculations in one place
 
+## Provenance
+
+This repository is an integration and adaptation of two upstream open-source projects:
+
+- [Bidking_bot](https://github.com/sarkozyfan/bidking-bot)
+- [Bidking_shadow](https://github.com/zxTinF/bidking_shadow)
+
+Some parts of this codebase are derived from or adapted from those projects, while other parts are original work written for this repository, including the GUI layer, workflow integration, configuration handling, and documentation.
+
 ## Key Features
 
 - Full-window OCR polling for round numbers, end prompts, and lobby state

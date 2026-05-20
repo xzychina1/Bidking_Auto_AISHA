@@ -31,6 +31,12 @@ BidKing Fresh Bot is an OCR-based automation tool for the Windows desktop game B
 
 If you want the full project documentation, switch to one of the language-specific versions above.
 
+## Provenance
+
+This repository is an integration and adaptation of two upstream open-source projects: [Bidking_bot](https://github.com/sarkozyfan/bidking-bot) and [Bidking_shadow](https://github.com/zxTinF/bidking_shadow).
+
+The codebase also contains original work, including the GUI layer, workflow integration, configuration handling, and project-level documentation. Some components are derived from or adapted from the upstream projects, while others are newly written for this repository.
+
 ## Quick Links
 
 - [GUI launch and usage](README.en.md#run-modes)
