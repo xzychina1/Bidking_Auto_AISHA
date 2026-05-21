@@ -214,29 +214,33 @@ bidking_fresh_bot\dist\BidKingFreshBot_release.exe
 
 ## GIF 演示
 
-作业要求至少两段 GIF。这里先给出推荐位置，你可以录制后替换为真实文件：
+下面这组 GIF 按录制时间从早到晚排列，串成一次完整流程：
 
-### GIF 1: GUI 启动与主界面
+### 1. 21:25:47
 
-<img src="docs/assets/gui-launch.gif" alt="GUI launch demo" width="100%" />
+<img src="docs/assets/demos/01-212547.gif" alt="Step 1: 21:25:47" width="100%" />
 
-建议录制内容：
+### 2. 21:34:55
 
-- 启动 GUI
-- 切换地图、模式、角色
-- 查看日志区和手动计算器页
+<img src="docs/assets/demos/02-213455.gif" alt="Step 2: 21:34:55" width="100%" />
 
-### GIF 2: 运行一轮自动化流程
+### 3. 21:37:49
 
-<img src="docs/assets/run-flow.gif" alt="Run flow demo" width="100%" />
+<img src="docs/assets/demos/03-213749.gif" alt="Step 3: 21:37:49" width="100%" />
 
-建议录制内容：
+### 4. 21:40:41
 
-- 识别当前回合
-- 计算建议出价
-- 自动执行出价或显示安全拦截
+<img src="docs/assets/demos/04-214041.gif" alt="Step 4: 21:40:41" width="100%" />
 
-如果你还没有 GIF，可以先保留占位，后续把录制结果保存到上面两个路径。
+### 5. 21:44:41
+
+<img src="docs/assets/demos/05-214441.gif" alt="Step 5: 21:44:41" width="100%" />
+
+### 6. 21:50:48
+
+<img src="docs/assets/demos/06-215048.gif" alt="Step 6: 21:50:48" width="100%" />
+
+这 6 段 GIF 一起展示了从启动、配置、识别到执行的完整路径，适合直接作为作业里的“全流程演示”。
 
 ## FAQ
 

@@ -44,6 +44,13 @@ The codebase also contains original work, including the GUI layer, workflow inte
 - [Architecture diagram](README.en.md#architecture)
 - [FAQ](README.zh-CN.md#faq)
 
+## Animated Demos
+
+The full chronological GIF walkthrough is embedded in the language-specific READMEs:
+
+- [中文全流程 GIF](README.zh-CN.md#gif-演示)
+- [English full-flow GIFs](README.en.md#gif-demos)
+
 ## Notes
 
 - The repository includes the BidKing Shadow code under [bidking_shadow/](bidking_shadow), so no separate external installation is required for the default workflow.

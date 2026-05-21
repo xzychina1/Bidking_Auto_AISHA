@@ -214,29 +214,33 @@ This prevents the model from producing extreme bids.
 
 ## GIF Demos
 
-The assignment requires at least two GIFs. Place your recorded files here later:
+The following GIFs are ordered by recording time, so together they show a complete end-to-end flow:
 
-### GIF 1: GUI launch and main screen
+### 1. 21:25:47
 
-<img src="docs/assets/gui-launch.gif" alt="GUI launch demo" width="100%" />
+<img src="docs/assets/demos/01-212547.gif" alt="Step 1: 21:25:47" width="100%" />
 
-Suggested capture:
+### 2. 21:34:55
 
-- Launch the GUI
-- Switch map, mode, and role
-- Show the log panel and manual calculator tab
+<img src="docs/assets/demos/02-213455.gif" alt="Step 2: 21:34:55" width="100%" />
 
-### GIF 2: One automation run
+### 3. 21:37:49
 
-<img src="docs/assets/run-flow.gif" alt="Run flow demo" width="100%" />
+<img src="docs/assets/demos/03-213749.gif" alt="Step 3: 21:37:49" width="100%" />
 
-Suggested capture:
+### 4. 21:40:41
 
-- Detect the current round
-- Compute the suggested bid
-- Place the bid or show the safety block
+<img src="docs/assets/demos/04-214041.gif" alt="Step 4: 21:40:41" width="100%" />
 
-If you do not have the GIFs yet, keep these placeholders and replace them later with the recorded files.
+### 5. 21:44:41
+
+<img src="docs/assets/demos/05-214441.gif" alt="Step 5: 21:44:41" width="100%" />
+
+### 6. 21:50:48
+
+<img src="docs/assets/demos/06-215048.gif" alt="Step 6: 21:50:48" width="100%" />
+
+Together, these clips cover launch, configuration, detection, and execution, which works well as a full-flow demo for the assignment.
 
 ## FAQ
 
