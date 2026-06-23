@@ -51,4 +51,3 @@ The codebase also contains original work, including the GUI layer, workflow inte
 
 - The repository includes the BidKing Shadow code under [bidking_shadow/](bidking_shadow), so no separate external installation is required for the default workflow.
 - The default suggested-bid cap is 3,000,000.
-- The walkthrough GIFs are embedded inline in the language-specific READMEs, each at the step it illustrates.

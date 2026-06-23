@@ -79,7 +79,7 @@ Some parts of this codebase are derived from or adapted from those projects, whi
 
 ## Architecture
 
-The diagrams below are exported from the draw.io sources in [docs/architecture/](docs/architecture). Every arrow is labelled with **what it carries**, and components are grouped into the lanes that own them.
+Every arrow is labelled with **what it carries**, and components are grouped into the lanes that own them. (Editable sources: [docs/architecture/](docs/architecture).)
 
 **Context & container view** — the operator drives the GUI; the runtime captures and OCRs the screen, turns recognised text into a valuation decision, and acts on the game through the mouse controller.
 
@@ -182,7 +182,7 @@ powershell -ExecutionPolicy Bypass -File .\bidking_fresh_bot\start.ps1
 
 ## Usage Walkthrough: One Full Run
 
-This is what an actual end-to-end run looks like. Each GIF is placed at the step it illustrates; the clips were recorded as one continuous session, so together they cover launch → bidding → match end.
+This is what an actual end-to-end run looks like — recorded as one continuous session, from launch through bidding to match end.
 
 ### Step 0 — Launch the assistant beside the game
 
