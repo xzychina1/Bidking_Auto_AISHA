@@ -44,7 +44,6 @@ The codebase also contains original work, including the GUI layer, workflow inte
 - [Why this project exists](README.en.md#why-this-project-exists)
 - [Running it next to the game (and after building the EXE)](README.en.md#running-it-next-to-the-game)
 - [Usage walkthrough — one full run, with demos](README.en.md#usage-walkthrough-one-full-run)
-- [Calibrating for your screen](README.en.md#calibrating-for-your-screen)
 - [Architecture](README.en.md#architecture) · [FAQ](README.en.md#faq)
 - 中文：[使用全流程演示](README.zh-CN.md#使用全流程演示) · [项目简介](README.zh-CN.md#项目简介)
 

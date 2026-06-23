@@ -1,0 +1,102 @@
+<mxfile host="app.diagrams.net" agent="5.0 (Windows)">
+  <diagram id="components" name="Components &amp; Sequence">
+    <mxGraphModel dx="2926" dy="1140" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" connectable="0" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#1F2937;strokeColor=none;fillColor=none;" value="BidKing Fresh Bot | Component &amp; Sequence View" vertex="1">
+          <mxGeometry height="30" width="560" x="30" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="inputLane" connectable="0" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#BFDBFE;strokeWidth=1;fontSize=12;fontStyle=1;align=left;verticalAlign=top;spacingLeft=12;spacingTop=8;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Input &amp; Control&lt;/font&gt;" vertex="1">
+          <mxGeometry height="200" width="250" x="100" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="perceptionLane" connectable="0" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#C4B5FD;strokeWidth=1;fontSize=12;fontStyle=1;align=left;verticalAlign=top;spacingLeft=12;spacingTop=8;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Perception &amp; Recognition&lt;/font&gt;" vertex="1">
+          <mxGeometry height="190" width="1010" x="610" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="decisionLane" connectable="0" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#BBF7D0;strokeWidth=1;fontSize=12;fontStyle=1;align=left;verticalAlign=top;spacingLeft=12;spacingTop=8;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Decision &amp; Execution&lt;/font&gt;" vertex="1">
+          <mxGeometry height="180" width="1020" x="590" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="observabilityLane" connectable="0" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=12;fontStyle=1;align=left;verticalAlign=top;spacingLeft=12;spacingTop=8;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Observability &amp; Config&lt;/font&gt;" vertex="1">
+          <mxGeometry height="200" width="1580" x="70" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="gui" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;strokeWidth=1;fontSize=12;align=center;verticalAlign=middle;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;b style=&quot;&quot;&gt;GUI&lt;/b&gt;&lt;/font&gt;&lt;br&gt;Start / Stop / Parameters&lt;/font&gt;" vertex="1">
+          <mxGeometry height="100" width="225" x="112.5" y="224" as="geometry" />
+        </mxCell>
+        <mxCell id="ocrComp" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E8FF;strokeColor=#9333EA;strokeWidth=1;fontSize=12;align=center;verticalAlign=middle;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;b style=&quot;&quot;&gt;OCR Engine&lt;/b&gt;&lt;/font&gt;&lt;br&gt;rapidocr&lt;/font&gt;" vertex="1">
+          <mxGeometry height="72" width="170" x="650" y="238" as="geometry" />
+        </mxCell>
+        <mxCell id="matcher" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7ED;strokeColor=#EA580C;strokeWidth=1;fontSize=12;align=center;verticalAlign=middle;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;b style=&quot;&quot;&gt;Image Matcher&lt;/b&gt;&lt;/font&gt;&lt;br&gt;template matching&lt;/font&gt;" vertex="1">
+          <mxGeometry height="72" width="190" x="1370" y="238" as="geometry" />
+        </mxCell>
+        <mxCell id="estimator" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#16A34A;strokeWidth=1;fontSize=12;align=center;verticalAlign=middle;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;b style=&quot;&quot;&gt;Estimator&lt;/b&gt;&lt;/font&gt;&lt;br&gt;price extraction&lt;/font&gt;" vertex="1">
+          <mxGeometry height="72" width="190" x="1370" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="strategy" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEFCE8;strokeColor=#CA8A04;strokeWidth=1;fontSize=12;align=center;verticalAlign=middle;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;b style=&quot;&quot;&gt;Strategy Engine&lt;/b&gt;&lt;/font&gt;&lt;br&gt;bid cap / thresholds&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="220" x="640" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="_l-tNfHiobfBsD_MCFM3-3" edge="1" parent="1" source="mouse" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startArrow=classic;startFill=1;endArrow=none;endFill=0;" target="strategy">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_l-tNfHiobfBsD_MCFM3-5" connectable="0" parent="_l-tNfHiobfBsD_MCFM3-3" style="edgeLabel;html=1;align=right;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;decision becomes action&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.4175" y="-2" as="geometry">
+            <mxPoint x="160" y="-16" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_l-tNfHiobfBsD_MCFM3-7" connectable="0" parent="_l-tNfHiobfBsD_MCFM3-3" style="edgeLabel;html=1;align=right;verticalAlign=top;resizable=0;points=[];" value="&lt;font&gt;&lt;span style=&quot;font-size: 18px;&quot;&gt;including recoginze&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-family: LatoWeb, &amp;quot;Lato Extended&amp;quot;, Lato, &amp;quot;Helvetica Neue&amp;quot;, Helvetica, Arial, sans-serif; text-align: start; white-space: normal;&quot;&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;font style=&quot;color: rgb(0, 0, 0);&quot;&gt;timeouts and&lt;/font&gt;&lt;/font&gt;&lt;/span&gt;&lt;span style=&quot;font-size: 18px;&quot;&gt;&amp;nbsp;false to end game&lt;/span&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.6181" y="1" as="geometry">
+            <mxPoint x="108" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mouse" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#64748B;strokeWidth=1;fontSize=12;align=center;verticalAlign=middle;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;b style=&quot;&quot;&gt;Mouse Controller&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="64" width="180" x="980" y="926" as="geometry" />
+        </mxCell>
+        <mxCell id="_l-tNfHiobfBsD_MCFM3-2" edge="1" parent="1" source="logger" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startArrow=classic;startFill=1;endArrow=none;endFill=0;" target="strategy">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_l-tNfHiobfBsD_MCFM3-4" connectable="0" parent="_l-tNfHiobfBsD_MCFM3-2" style="edgeLabel;html=1;align=center;verticalAlign=bottom;resizable=0;points=[];labelBackgroundColor=none;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;result logging&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.096" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="logger" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#64748B;strokeWidth=1;fontSize=12;align=center;verticalAlign=middle;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;b style=&quot;&quot;&gt;Logger &amp;amp; Config&lt;/b&gt;&lt;/font&gt;&lt;br&gt;logs / config.json&lt;/font&gt;" vertex="1">
+          <mxGeometry height="84" width="240" x="105" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="summary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=1;fontSize=12;align=center;verticalAlign=middle;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;b style=&quot;&quot;&gt;Output&lt;/b&gt;&lt;/font&gt;&lt;br&gt;console / progress / result&lt;/font&gt;" vertex="1">
+          <mxGeometry height="84" width="240" x="1380" y="916" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" edge="1" parent="1" source="gui" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#334155;endArrow=block;fontSize=18;fontColor=#334155;labelBackgroundColor=none;verticalAlign=bottom;" target="ocrComp" value="Trigger capture + recognition">
+          <mxGeometry relative="1" x="-0.1495" y="14" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c2" edge="1" parent="1" source="ocrComp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#334155;endArrow=block;fontSize=18;fontColor=#334155;labelBackgroundColor=none;verticalAlign=bottom;" target="matcher" value="Text is verified against the UI">
+          <mxGeometry relative="1" x="0.0618" y="10" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c3" edge="1" parent="1" source="matcher" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#334155;endArrow=block;fontSize=18;fontColor=#334155;labelBackgroundColor=none;" target="estimator" value="Matched result becomes a price input">
+          <mxGeometry relative="1" x="-0.2632" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c4" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#334155;endArrow=block;fontSize=18;fontColor=#334155;labelBackgroundColor=none;verticalAlign=bottom;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="strategy" value="Calculated price enters bid rules">
+          <mxGeometry relative="1" x="0.1364" y="-6" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="1370" y="535.5" as="sourcePoint" />
+            <mxPoint x="930" y="535.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c6" edge="1" parent="1" source="gui" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#334155;endArrow=block;fontSize=18;fontColor=#334155;labelBackgroundColor=none;verticalAlign=middle;align=left;" target="logger" value="Settings persistence / runtime status">
+          <mxGeometry relative="1" x="0.0102" y="-135" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c8" edge="1" parent="1" source="mouse" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#334155;endArrow=block;fontSize=18;fontColor=light-dark(#000000, #acb8c9);verticalAlign=bottom;labelBackgroundColor=none;" target="summary" value="Action output / verification">
+          <mxGeometry relative="1" x="-0.0364" y="8" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
