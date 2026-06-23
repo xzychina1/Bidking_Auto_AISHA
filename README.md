@@ -29,6 +29,8 @@
 
 BidKing Fresh Bot is an OCR-based automation tool for the Windows desktop game BidKing. It reads the game state, computes suggested bids, and drives the GUI automation loop from a Tkinter interface.
 
+It exists to fuse two upstream projects — one that *clicks* ([bidking-bot](https://github.com/sarkozyfan/bidking-bot)) and one that *values loot* ([bidking_shadow](https://github.com/zxTinF/bidking_shadow)) — behind a single GUI and a packaged EXE, so a player can run a whole match end to end without editing JSON or wiring scripts together.
+
 If you want the full project documentation, switch to one of the language-specific versions above.
 
 ## Provenance
@@ -39,20 +41,15 @@ The codebase also contains original work, including the GUI layer, workflow inte
 
 ## Quick Links
 
-- [GUI launch and usage](README.en.md#run-modes)
-- [Project overview in Chinese](README.zh-CN.md#项目简介)
-- [Architecture diagram](README.en.md#architecture)
-- [FAQ](README.zh-CN.md#faq)
-
-## Animated Demos
-
-The full chronological GIF walkthrough is embedded in the language-specific READMEs:
-
-- [中文全流程 GIF](README.zh-CN.md#gif-演示)
-- [English full-flow GIFs](README.en.md#gif-demos)
+- [Why this project exists](README.en.md#why-this-project-exists)
+- [Running it next to the game (and after building the EXE)](README.en.md#running-it-next-to-the-game)
+- [Usage walkthrough — one full run, with demos](README.en.md#usage-walkthrough-one-full-run)
+- [Calibrating for your screen](README.en.md#calibrating-for-your-screen)
+- [Architecture](README.en.md#architecture) · [FAQ](README.en.md#faq)
+- 中文：[使用全流程演示](README.zh-CN.md#使用全流程演示) · [项目简介](README.zh-CN.md#项目简介)
 
 ## Notes
 
 - The repository includes the BidKing Shadow code under [bidking_shadow/](bidking_shadow), so no separate external installation is required for the default workflow.
 - The default suggested-bid cap is 3,000,000.
-- GIF placeholders are included in the language-specific READMEs and can be replaced with real recordings later.
+- The walkthrough GIFs are embedded inline in the language-specific READMEs, each at the step it illustrates.

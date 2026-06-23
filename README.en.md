@@ -23,72 +23,108 @@
 ## Table of Contents
 
 - [Project Overview](#project-overview)
+- [Why This Project Exists](#why-this-project-exists)
+- [Provenance](#provenance)
 - [Key Features](#key-features)
 - [Architecture](#architecture)
 - [Project Layout](#project-layout)
-- [Dependencies](#dependencies)
-- [Quick Start](#quick-start)
-- [Run Modes](#run-modes)
-- [Usage Examples](#usage-examples)
-- [GIF Demos](#gif-demos)
+- [Requirements](#requirements)
+- [Install](#install)
+- [Running It Next to the Game](#running-it-next-to-the-game)
+- [Usage Walkthrough: One Full Run](#usage-walkthrough-one-full-run)
+- [Calibrating for Your Screen](#calibrating-for-your-screen)
+- [The Manual Calculator](#the-manual-calculator)
 - [FAQ](#faq)
 - [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ## Project Overview
 
-BidKing Fresh Bot is an OCR-based automation tool for the Windows desktop game BidKing. It is aimed at users who run the game locally and want a GUI to manage settings, reduce manual JSON editing, and automate repetitive bidding steps.
+BidKing Fresh Bot is an OCR-based automation tool for the Windows desktop game BidKing. It reads the auction screen, decides what to bid, and drives the mouse and keyboard so a full match runs without you watching it. Everything is controlled from a single Tkinter GUI — you pick the map, mode, role, and risk level, press **开启 (Start)**, and the bot takes over the round-by-round bidding loop.
 
-Why this project exists:
+## Why This Project Exists
 
-- Read round numbers and auction state from the central game UI
-- Convert OCR text into structured data
-- Compute suggested bids from a price model and category weights
-- Execute tool usage, bidding, confirmation, and round transitions automatically
-- Keep day-to-day configuration, debugging, and manual calculations in one place
+This is not "yet another bot." It exists to close a specific gap left by its two upstream projects.
+
+- [bidking-bot](https://github.com/sarkozyfan/bidking-bot) solves the **clicking** half — the input-automation loop — but you configure it by hand-editing JSON and running scripts from a terminal.
+- [bidking_shadow](https://github.com/zxTinF/bidking_shadow) solves the **valuation** half — reading game logs and pricing loot from drop tables — but it lives as standalone CSVs and scripts, disconnected from any live bidding loop.
+
+Both assume a developer at a command line, and neither gives you one place to actually *play a match*. This repository fuses the two and adds the layer that makes them usable as a product:
+
+- **One GUI for every knob.** Map, mode, role, aggression, tool rounds, bid cap, safety, and shadow valuation are all toggles and dropdowns — you never edit `config.json` by hand to play.
+- **Valuation wired into the live loop.** A bridge feeds bidking_shadow's per-item estimates straight into the bid the bot is about to type, instead of leaving it as an offline calculation.
+- **Resolution independence.** Every click and capture region is stored against a 1920×1080 reference and **auto-scaled** to your real window size, so the bot survives windows that aren't exactly reference-sized.
+- **A packaged EXE.** `build_exe.ps1` produces a single file that bundles Python and the OCR models, so it runs on a Windows machine with no development environment.
+- **A manual-calculator tab** to sanity-check the pricing model on its own, separate from a live run.
+
+In short: it turns two developer-facing scripts into something a player can launch and run end to end.
 
 ## Provenance
 
-This repository is an integration and adaptation of two upstream open-source projects:
+This repository is an integration and adaptation of the two upstream open-source projects above:
 
 - [Bidking_bot](https://github.com/sarkozyfan/bidking-bot)
 - [Bidking_shadow](https://github.com/zxTinF/bidking_shadow)
 
-Some parts of this codebase are derived from or adapted from those projects, while other parts are original work written for this repository, including the GUI layer, workflow integration, configuration handling, and documentation.
+Some parts of this codebase are derived from or adapted from those projects, while other parts are original work written for this repository, including the GUI layer, the shadow-valuation bridge, workflow integration, configuration handling, resolution scaling, and documentation.
 
 ## Key Features
 
 - Full-window OCR polling for round numbers, end prompts, and lobby state
-- Parsing for central info text, auction conditions, and item-related clues
-- Suggested bid calculation using configurable unit prices, weights, and risk profiles
-- GUI controls for map selection, run count, role, mode, and aggression level
-- Tool-round selection, bid caps, safe guard rules, and sticky increment support
-- Handling for end-of-match prompts, reward continue screens, auction lobby transitions, and home bid buttons
+- Parsing of the central info panel into structured auction facts (round, category, price clues)
+- Suggested-bid calculation from configurable unit prices, category weights, and a risk profile
+- GUI controls for map, run count, role, mode, and aggression — no manual JSON editing
+- Tool-round selection, a hard bid cap, an optional safe-guard, and sticky-increment growth
+- Handling for end-of-match prompts, reward-continue screens, lobby transitions, and home-bid buttons
 - Window focus and optional centering on startup to reduce capture and input failures
-- A manual calculator page for validating the pricing model separately
+- A manual calculator tab for validating the pricing model on its own
 
 ## Architecture
 
+Each arrow is labelled with **what it carries**, so the diagram reads as a data flow, not just a wiring map. Components are grouped by responsibility: capture/OCR, valuation, and orchestration.
+
 ```mermaid
-flowchart LR
-  A[Game window] --> B[Window capture]
-  B --> C[OCR text extraction]
-  C --> D[Central info parser]
-  D --> E[Bid advisor / pricing]
-  G[config.json] --> E
-  H[price_config.json] --> E
-  E --> F[GUI / bot loop]
-  F --> I[Mouse clicks / keyboard input]
-  F --> J[Logs, debug files, and run history]
+flowchart TD
+  subgraph GAME["BidKing game (windowed)"]
+    GW["Game window"]
+  end
+
+  subgraph CAP["Capture and OCR — bidking_maa_test"]
+    WB["window_backend (find + grab client area)"]
+    OCR["rapidocr / onnxruntime (image to text)"]
+    PAR["central_info_parser (text to facts)"]
+  end
+
+  subgraph VAL["Valuation — manual_bidking_advisor + shadow"]
+    ADV["bid advisor (price model + weights)"]
+    SHA["shadow bridge (getlog item values)"]
+    RISK["risk + cap + safe-guard (final bid)"]
+  end
+
+  subgraph ORC["Orchestration"]
+    GUI["bidking_gui (Tkinter controls + log)"]
+    LOOP["fresh_bidking_bot (state machine + poll loop)"]
+    ACT["pyautogui (clicks + keyboard)"]
+  end
+
+  CFG[("config.json + price_config.json")]
+
+  GW -- "screenshot of client area" --> WB
+  WB -- "scaled ROI crops (PNG)" --> OCR
+  OCR -- "raw text" --> PAR
+  PAR -- "round no. + auction facts" --> ADV
+  SHA -- "per-item expected value" --> ADV
+  ADV -- "suggested price (in 万 / w)" --> RISK
+  CFG -- "weights + unit prices" --> ADV
+  CFG -- "coords, caps, timing" --> LOOP
+  RISK -- "capped final bid" --> LOOP
+  GUI -- "start/stop + settings" --> LOOP
+  LOOP -- "where + when to click" --> ACT
+  ACT -- "mouse / keyboard events" --> GW
+  LOOP -- "log lines + round bundles" --> GUI
 ```
 
-The flow is straightforward:
-
-1. Capture the game window.
-2. OCR the central info area and supporting regions.
-3. Parse the current round, UI state, and available item information.
-4. Combine the configuration files and price model to compute a bid.
-5. Use mouse and keyboard automation to complete the bid flow.
+Read as five steps: **capture** the window → **OCR + parse** the center panel → **value** the lot (advisor, optionally fed by shadow) → **apply** risk/cap → **act** with mouse and keyboard, looping until the run count is reached.
 
 ## Project Layout
 
@@ -98,18 +134,19 @@ bidking-bot/
   README.zh-CN.md
   README.en.md
   requirements.txt
-  manual_bidking_advisor.py
+  manual_bidking_advisor.py        # pricing model + manual advisor
   bidking_fresh_bot/
-    bidking_gui.py
-    fresh_bidking_bot.py
-    config.json
-    price_config.json
-    start.ps1
-    build_exe.ps1
+    bidking_gui.py                 # Tkinter GUI (the entry point you run)
+    fresh_bidking_bot.py           # bot loop / state machine
+    bidking_shadow_bridge.py       # wires shadow valuation into the loop
+    config.json                    # coordinates, timing, modes, caps
+    price_config.json              # grid prices + category weights
+    start.ps1                      # run the bot loop headless
+    build_exe.ps1                  # package the one-file EXE
   bidking_maa_test/
-    central_info_parser.py
-    window_backend.py
-    analyze_screenshot.py
+    window_backend.py              # Win32 capture + coordinate scaling
+    central_info_parser.py         # OCR text -> structured facts
+    analyze_screenshot.py          # overlay ROI boxes on a screenshot
     roi_config.json
   bidking_shadow/
     getlog/
@@ -117,29 +154,19 @@ bidking-bot/
   docs/
     assets/
       bidking-banner.svg
+      demos/                       # the walkthrough GIFs
 ```
 
-## Dependencies
-
-Recommended setup:
+## Requirements
 
 - Windows 10 or Windows 11
 - Python 3.11 or Python 3.12
-- A desktop game window
-- 1920x1080 layout for the default coordinates
+- The BidKing game running in **windowed** mode
+- A 1920×1080 game window matches the default coordinates best (other sizes auto-scale; see [Calibrating for Your Screen](#calibrating-for-your-screen))
 
-The main third-party packages come from [requirements.txt](requirements.txt):
+Main third-party packages (from [requirements.txt](requirements.txt)): Pillow, numpy, opencv-python, pyautogui, rapidocr-onnxruntime, onnxruntime, psutil, pyinstaller.
 
-- Pillow
-- numpy
-- opencv-python
-- pyautogui
-- rapidocr-onnxruntime
-- onnxruntime
-- psutil
-- pyinstaller
-
-## Quick Start
+## Install
 
 Create a virtual environment and install dependencies:
 
@@ -149,55 +176,143 @@ python -m venv .venv
 python -m pip install -r .\requirements.txt
 ```
 
-If PowerShell blocks script execution, temporarily allow it for the current session:
+If PowerShell blocks script execution, allow it for the current session only:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
 ```
 
-## Run Modes
+## Running It Next to the Game
 
-### Start the GUI from source
+The bot drives the **real** game window, so BidKing must be open the whole time it runs.
+
+1. Launch BidKing in **windowed** mode, ideally at 1920×1080.
+2. The bot finds the window by the title keyword `"BidKing"` (`window.title_keyword` in `config.json`). If several windows match, set `window.hwnd` to target one exactly.
+3. On **开启 (Start)** it brings that window to the front and, by default, centers it (`window.center_on_start`) so input and capture line up. **Don't move or cover the window while it runs.**
+
+### After building the EXE
+
+`build_exe.ps1` produces a single self-contained file:
+
+```powershell
+cd .\bidking_fresh_bot
+powershell -ExecutionPolicy Bypass -File .\build_exe.ps1
+# output: bidking_fresh_bot\dist\BidKingFreshBot_release.exe
+```
+
+That EXE bundles Python, the OCR models, `config.json`, and `price_config.json`, so it runs on a Windows machine **with no Python installed**. To use it:
+
+1. Launch BidKing (windowed).
+2. Double-click `BidKingFreshBot_release.exe`. The **same GUI** opens — it behaves exactly like `python bidking_gui.py`.
+3. Choose your settings in the GUI and click **开启 (Start)**.
+
+To change the baked-in defaults the EXE ships with, edit `config.json` / `price_config.json` and rebuild.
+
+### Other ways to launch
+
+```powershell
+# Run the bot loop headless (no GUI), using config.json
+powershell -ExecutionPolicy Bypass -File .\bidking_fresh_bot\start.ps1
+```
+
+## Usage Walkthrough: One Full Run
+
+This is what an actual end-to-end run looks like. Each GIF is placed at the step it illustrates, and the log lines below are representative output from the GUI's **运行日志 / Debug** panel (timestamps abbreviated). The clips were recorded as one continuous session, so together they cover launch → bidding → match end.
+
+### Step 0 — Launch the assistant beside the game
 
 ```powershell
 cd .\bidking_fresh_bot
 python .\bidking_gui.py
 ```
 
-### Start via the included script
+<img src="docs/assets/demos/01-launch-and-lobby.gif" alt="The assistant running next to the game at the auction lobby" width="100%" />
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\bidking_fresh_bot\start.ps1
-```
+*The assistant (left) running from source next to the game at the auction lobby (right). The green **竞拍** button is the entry the bot clicks to enter a room.*
 
-### Build the EXE
+### Step 1 — Set up the run in the 自动化 (Automation) tab
 
-```powershell
-cd .\bidking_fresh_bot
-powershell -ExecutionPolicy Bypass -File .\build_exe.ps1
-```
+Before pressing Start, set:
 
-The default output is usually:
+- **地图 (Map)** — the map you're farming, e.g. `1. 快递盲盒堆`.
+- **模式 (Mode)** — `标准模式` (normal) or `快递跑刀` (express, which auto-locks the map to 快递盲盒堆 and bids `item count × per-item price`).
+- **角色 (Role)** — currently `爱莎`.
+- **重复次数 (Repeat count)** — how many matches to run before stopping.
+- **6. 拍卖激进度 (Aggression)** — `保守` (floor price), `均衡` (average), `激进` (average +25%), or `自定义` with a custom multiplier (e.g. `-0.2` = 80% of average, `0.8` = 180%).
+- **5. 道具使用回合 (Tool rounds)** — tick the rounds that should auto-use the leftmost tool.
+- Optional safety in **4. 爱莎逻辑与安全**: the **安全开关 (safe-guard)** caps how much a bid may jump round-over-round, and **防黏递增 (sticky increment)** forces steady linear growth. The hard **bid cap** defaults to 3,000,000.
+
+### Step 2 — Press 开启 (Start)
+
+The bot attaches to the game window, centers it, and begins polling:
 
 ```text
-bidking_fresh_bot\dist\BidKingFreshBot_release.exe
+[21:25:48] fresh bot started
+[21:25:48] mode: full-window OCR -> lobby/end/round handling
+[21:25:48] window centered: hwnd=2491276 pos=0,0 size=1920x1080
+[21:25:49] loop 1: observed round=None end=False lobby=True reward_continue=False home_bid=False any=True
+[21:25:49] auction lobby detected: select map 1.快递盲盒堆
+[21:25:49] click map point: screen=689,400
+[21:25:49] map selection transition complete; waiting for round OCR
 ```
 
-## Usage Examples
+### Step 3 — Round 1: read the center panel and price the lot
 
-### 1. Check the GUI settings first
+<img src="docs/assets/demos/02-round1-read-center.gif" alt="Round 1 — reading the center info panel" width="100%" />
 
-After opening the GUI, verify:
+*Round 1. The bot OCRs the center info panel (character **艾莎** and the auction conditions), parses it into facts, and computes a suggested bid before touching the **出价** button.*
 
-- The map matches your current game scene
-- The mode is correct for your run style
-- The role is selected properly
-- The tool rounds are checked as expected
-- The safety settings and bid cap are acceptable
+```text
+[21:34:56] loop 6: observed round=1 end=False lobby=False reward_continue=False home_bid=False any=True
+[21:34:56] loop 6: round 1 detected
+[21:34:56] round 1 detected: wait 10s
+[21:35:06] tool sequence: open/select/confirm
+[21:35:06] click tool_button #1: screen=630,970
+[21:35:09] price computed: 156200; 均衡=avg_price: 15.6200w * 10000 -> input=156200; final=156200; facts=8 combo=5
+```
 
-### 2. 3,000,000 bid cap
+### Step 4 — Bid submitted
 
-The project now caps the suggested bid at 3,000,000 by default. You can see it in the configuration:
+<img src="docs/assets/demos/03-bid-submitted.gif" alt="Bid submitted — already-bid vs estimated floor" width="100%" />
+
+*Bid placed. The bottom shows **已出价** (submitted) and the right shows **当前预估最低价** (the estimated floor) — the number the price model is steering toward.*
+
+```text
+[21:37:50] bid sequence: open/input/confirm
+[21:37:50] click bid_button #1: screen=862,972
+[21:37:50] type price: 156200
+[21:37:51] click bid_confirm #1: screen=1057,988
+```
+
+### Step 5 — Mid rounds: per-category valuation
+
+<img src="docs/assets/demos/04-category-valuation.gif" alt="A later round with a category-average valuation popup" width="100%" />
+
+*A later round. The auction-info popup gives a category average (here gold-quality average = 41270). The advisor applies your category weights and re-prices the lot every round.*
+
+### Step 6 — Round 4: the decisive, competitive round
+
+<img src="docs/assets/demos/05-round4-compete.gif" alt="Round 4 — competing against other players' bids" width="100%" />
+
+*Round 4 — the round that usually decides the lot. Rival bids stack up on the left; the bot's bid (**已出价 144653**) is set to clear the estimated floor (50,757) without exceeding the 3,000,000 cap.*
+
+### Step 7 — Match end: settle and continue
+
+<img src="docs/assets/demos/06-match-end.gif" alt="Match over — settlement screen and auto-continue" width="100%" />
+
+***对局结束** (match over). The bot handles the settlement screen, clicks through to continue, then either starts the next match or exits once **重复次数** is reached.*
+
+```text
+[21:50:49] loop 41: end prompt detected
+[21:50:49] post-round transition: fixed click chain
+[21:50:51] post-round transition complete; waiting for auction lobby OCR
+[21:50:51] completed runs: 1/1
+[21:50:51] target runs reached; exit
+```
+
+### A note on the bid cap
+
+The suggested bid is capped at 3,000,000 by default so the model can't produce an extreme bid. You can see it in [bidking_fresh_bot/config.json](bidking_fresh_bot/config.json):
 
 ```json
 "automation": {
@@ -205,68 +320,62 @@ The project now caps the suggested bid at 3,000,000 by default. You can see it i
 }
 ```
 
-This prevents the model from producing extreme bids.
+The two files that drive every decision are [bidking_fresh_bot/config.json](bidking_fresh_bot/config.json) (coordinates, timing, modes, caps) and [bidking_fresh_bot/price_config.json](bidking_fresh_bot/price_config.json) (grid prices and category weights).
 
-### 3. Key configuration files
+## Calibrating for Your Screen
 
-- [bidking_fresh_bot/config.json](bidking_fresh_bot/config.json)
-- [bidking_fresh_bot/price_config.json](bidking_fresh_bot/price_config.json)
+Every click and capture region in `config.json` is defined against a **1920×1080 reference** (`window.reference_client_size`) and **auto-scaled** to your actual window size at runtime. A differently-sized window therefore often works with no edits at all. If clicks land in the wrong place, recalibrate like this:
 
-## GIF Demos
+1. **See where every click will actually land.** This prints each named click as `name: config=(x,y) origin=... -> screen=(x,y)` for your current window, then exits — compare it against the live game:
 
-The following GIFs are ordered by recording time, so together they show a complete end-to-end flow:
+   ```powershell
+   cd .\bidking_fresh_bot
+   python .\fresh_bidking_bot.py --print-clicks
+   ```
 
-### 1. 21:25:47
+2. **Check what the OCR regions are reading.** Take a screenshot of the game, then overlay every region box on it:
 
-<img src="docs/assets/demos/01-212547.gif" alt="Step 1: 21:25:47" width="100%" />
+   ```powershell
+   python .\bidking_maa_test\analyze_screenshot.py --image C:\path\to\screenshot.png
+   ```
 
-### 2. 21:34:55
+3. **Capture exactly what each region grabbed during a run** by turning on debug output in `config.json`; crops and per-round bundles are written under `bidking_fresh_bot\runs\`:
 
-<img src="docs/assets/demos/02-213455.gif" alt="Step 2: 21:34:55" width="100%" />
+   ```json
+   "debug": { "save_crops": true, "save_round_debug": true }
+   ```
 
-### 3. 21:37:49
+4. **Adjust the numbers.** Map-entry points are under `automation.maps.<n>.point`, per-action clicks under `clicks.*`, and OCR regions under `capture.*`. Most points use a top-left origin; some use `"origin": "left_bottom"` (the `y` value is measured from the bottom). Keep your edits in 1920×1080 reference space — the bot scales them to the live window for you.
 
-<img src="docs/assets/demos/03-213749.gif" alt="Step 3: 21:37:49" width="100%" />
+## The Manual Calculator
 
-### 4. 21:40:41
-
-<img src="docs/assets/demos/04-214041.gif" alt="Step 4: 21:40:41" width="100%" />
-
-### 5. 21:44:41
-
-<img src="docs/assets/demos/05-214441.gif" alt="Step 5: 21:44:41" width="100%" />
-
-### 6. 21:50:48
-
-<img src="docs/assets/demos/06-215048.gif" alt="Step 6: 21:50:48" width="100%" />
-
-Together, these clips cover launch, configuration, detection, and execution, which works well as a full-flow demo for the assignment.
+The **手动计算器 (Manual Calculator)** tab runs the same pricing model the bot uses, but on numbers you type in by hand — useful for checking what a bid *should* be without launching a live run. Enter the round, role, and the per-color counts/grids/prices, click **计算 (Calculate)**, and it prints the breakdown. **同步自动化设置 (Sync from Automation)** copies your current role and weights over so the calculator and the bot agree.
 
 ## FAQ
 
-### Why does the GUI not start running automatically?
+### Why doesn't the GUI start running on its own?
 
-The GUI is only the configuration and launch entry point. You still need to review the settings and click Start.
+The GUI is only the configuration and launch entry point. Review the settings, then click **开启 (Start)** to begin the loop.
 
 ### Why does the bot fail to detect a round?
 
-Usually the window capture target is wrong, or the game layout does not match the default ROI. Check the window title, resolution, scaling, and coordinates in config.json.
+Usually the wrong window is captured, or the game layout doesn't match the default regions. Check the window title, resolution, and scaling, and use the calibration tools above to confirm the capture regions line up.
 
 ### Why is the suggested bid sometimes too high or too low?
 
-The bid is affected by the price model, category weights, risk profile, safety limits, and the 3,000,000 cap. Use the manual calculator tab to inspect the inputs.
+The bid depends on the price model, category weights, the risk profile, the safety limits, and the 3,000,000 cap. Use the manual calculator tab to inspect the inputs.
 
-### Why did my JSON changes not take effect?
+### Why didn't my JSON change take effect?
 
-Make sure you edited the file the running process actually uses. The safest path is to change settings through the GUI and restart if needed.
+Make sure you edited the file the running process actually uses. The safest path is to change settings through the GUI and restart if needed. The packaged EXE uses the `config.json` baked in at build time — rebuild to change its defaults.
 
 ### Why does the bot skip some rounds?
 
-A round may already be handled, or it may be blocked by debounce logic, the safety guard, or an end-prompt transition. The log panel will show the reason.
+A round may already be handled, or it may be blocked by the debounce logic, the safe-guard, or an end-prompt transition. The log panel shows the reason (e.g. `round X already handled; waiting` or `bid skipped: ...`).
 
-### Do I have to use 1920x1080?
+### Do I have to use 1920×1080?
 
-No, but the default coordinates and capture regions are tuned for 1920x1080. Other resolutions usually require recalibration.
+No. The defaults are tuned for 1920×1080, but coordinates auto-scale to other sizes. Very different layouts may still need the recalibration steps above.
 
 ## Acknowledgements
 
@@ -275,7 +384,7 @@ Thanks to the following projects and ideas:
 - bidking_shadow: https://github.com/zxTinF/bidking_shadow
 - bidking-bot: https://github.com/sarkozyfan/bidking-bot
 
-This repository integrates the GUI, OCR, pricing advice, and automation flow on top of those ideas.
+This repository integrates the GUI, OCR, pricing advice, and automation flow on top of those projects.
 
 ## License
 
